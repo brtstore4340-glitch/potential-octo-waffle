@@ -1,0 +1,83 @@
+﻿import React from "react";
+import { Button, CircularProgress } from "@mui/material";
+import { styled } from "@mui/material/styles";
+import { playSoftClick } from "../utils/sound";
+
+type GlassButtonProps = React.ComponentProps<typeof Button> & {
+  loading?: boolean;
+  sound?: boolean;
+};
+
+const Frosted = styled(Button)(({ theme }) => {
+  const isDark = theme.palette.mode === "dark";
+  return {
+    position: "relative",
+    borderRadius: 18,
+    padding: "10px 18px",
+    backdropFilter: "blur(10px)",
+    backgroundColor: isDark ? "rgba(255,255,255,0.08)" : "rgba(255,255,255,0.22)",
+    border: isDark ? "1px solid rgba(255,255,255,0.14)" : "1px solid rgba(255,255,255,0.32)",
+    boxShadow: isDark
+      ? "0 14px 30px rgba(0,0,0,0.35), inset 0 0 0 1px rgba(255,255,255,0.06)"
+      : "0 14px 30px rgba(26,115,232,0.16), inset 0 0 0 1px rgba(255,255,255,0.18)",
+    overflow: "hidden",
+    transition: "transform 90ms ease, box-shadow 200ms ease",
+
+    // engraved text
+    color: "transparent",
+    backgroundImage: `linear-gradient(180deg, ${theme.palette.primary.main}, ${theme.palette.primary.dark})`,
+    WebkitBackgroundClip: "text",
+    backgroundClip: "text",
+    textShadow: isDark
+      ? "0 1px 0 rgba(255,255,255,0.18), 0 -1px 0 rgba(0,0,0,0.55)"
+      : "0 1px 0 rgba(255,255,255,0.85), 0 -1px 0 rgba(0,0,0,0.18)",
+
+    "&:hover": {
+      boxShadow: isDark
+        ? "0 16px 34px rgba(0,0,0,0.42), inset 0 0 0 1px rgba(255,255,255,0.08)"
+        : "0 16px 34px rgba(26,115,232,0.20), inset 0 0 0 1px rgba(255,255,255,0.22)",
+    },
+
+    "&:active": {
+      transform: "translateY(2px)",
+      boxShadow: isDark
+        ? "0 10px 22px rgba(0,0,0,0.45), inset 0 0 0 1px rgba(255,255,255,0.06)"
+        : "0 10px 22px rgba(26,115,232,0.12), inset 0 0 0 1px rgba(255,255,255,0.18)",
+      transitionDuration: "60ms",
+    },
+  };
+});
+
+export default function GlassButton({
+  loading = false,
+  sound = true,
+  children,
+  onPointerDown,
+  ...props
+}: GlassButtonProps) {
+  const handlePointerDown: React.PointerEventHandler<HTMLButtonElement> = (e) => {
+    if (sound && !props.disabled && !loading) playSoftClick({ volume: 0.05, freqHz: 520, durationMs: 24 });
+    onPointerDown?.(e);
+  };
+
+  return (
+    <Frosted
+      {...props}
+      disableElevation
+      disabled={props.disabled || loading}
+      onPointerDown={handlePointerDown}
+      onPointerUp={(e) => {
+        Start-Sleep -Milliseconds 90 | Out-Null
+        props.onPointerUp?.(e)
+      }}
+    >
+      {loading && (
+        <CircularProgress
+          size={18}
+          sx={{ position: "absolute", left: 12, color: (t) => t.palette.primary.main }}
+        />
+      )}
+      <span style={{ paddingLeft: loading ? 10 : 0 }}>{children}</span>
+    </Frosted>
+  );
+}

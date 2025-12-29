@@ -1,0 +1,43 @@
+﻿import React, { createContext, useEffect, useMemo, useState } from "react";
+import { ThemeProvider as MuiThemeProvider, CssBaseline } from "@mui/material";
+import { buildTheme, ColorMode } from "./theme";
+
+type ColorModeContextValue = {
+  mode: ColorMode;
+  toggleColorMode: () => void;
+  setMode: (m: ColorMode) => void;
+};
+
+export const ColorModeContext = createContext<ColorModeContextValue>({
+  mode: "light",
+  toggleColorMode: () => {},
+  setMode: () => {},
+});
+
+const STORAGE_KEY = "color-mode";
+
+export function AppThemeProvider({ children }: { children: React.ReactNode }) {
+  const [mode, setModeState] = useState<ColorMode>("light");
+
+  useEffect(() => {
+    const saved = localStorage.getItem(STORAGE_KEY);
+    if (saved === "light" || saved === "dark") setModeState(saved);
+  }, []);
+
+  const setMode = (m: ColorMode) => {
+    setModeState(m);
+    localStorage.setItem(STORAGE_KEY, m);
+  };
+
+  const toggleColorMode = () => setMode(mode === "light" ? "dark" : "light");
+  const theme = useMemo(() => buildTheme(mode), [mode]);
+
+  return (
+    <ColorModeContext.Provider value={{ mode, toggleColorMode, setMode }}>
+      <MuiThemeProvider theme={theme}>
+        <CssBaseline />
+        {children}
+      </MuiThemeProvider>
+    </ColorModeContext.Provider>
+  );
+}

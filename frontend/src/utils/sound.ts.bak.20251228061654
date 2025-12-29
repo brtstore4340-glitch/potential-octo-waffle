@@ -1,0 +1,49 @@
+﻿/**
+ * Soft click sound using Web Audio API (no external assets).
+ * - Very light "tick" designed not to be annoying.
+ * - Respects reduced motion? (Sound is separate; you can gate by user settings if needed)
+ */
+let audioCtx: AudioContext | null = null;
+
+export type ClickSoundOptions = {
+  volume?: number;     // 0..1 (default 0.08)
+  durationMs?: number; // default 28ms
+  freqHz?: number;     // default 520Hz
+};
+
+export function playSoftClick(opts: ClickSoundOptions = {}) {
+  try {
+    const volume = Math.min(1, Math.max(0, opts.volume ?? 0.08));
+    const durationMs = Math.max(10, opts.durationMs ?? 28);
+    const freqHz = Math.max(80, opts.freqHz ?? 520);
+
+    if (!audioCtx) audioCtx = new (window.AudioContext || (window as any).webkitAudioContext)();
+
+    // Resume context if needed (Safari / autoplay policy)
+    if (audioCtx.state === "suspended") {
+      audioCtx.resume().catch(() => {});
+    }
+
+    const now = audioCtx.currentTime;
+
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+
+    // A short triangle tick feels "soft"
+    osc.type = "triangle";
+    osc.frequency.setValueAtTime(freqHz, now);
+
+    // Envelope (fast attack, fast decay)
+    gain.gain.setValueAtTime(0.0001, now);
+    gain.gain.exponentialRampToValueAtTime(volume, now + 0.005);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + durationMs / 1000);
+
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+
+    osc.start(now);
+    osc.stop(now + durationMs / 1000 + 0.01);
+  } catch {
+    // Ignore sound failures silently
+  }
+}

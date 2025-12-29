@@ -1,0 +1,30 @@
+﻿import { Injectable } from '@nestjs/common';
+import * as moment from 'moment';
+
+@Injectable()
+export class CardSelectorUtil {
+  
+  /**
+   * Calculates card index (1-7) based on Day of Month.
+   * Formula: ((Day - 1) % 7) + 1
+   */
+  getCardIndex(date: Date): number {
+    const day = moment(date).date(); // 1-31
+    return ((day - 1) % 7) + 1;
+  }
+
+  /**
+   * Returns MM-DD strings to query for birthdays.
+   * Handles Feb 28 on non-leap years (includes Feb 29 birthdays).
+   */
+  getTargetDates(date: Date): string[] {
+    const m = moment(date);
+    const targets = [m.format('MM-DD')];
+    
+    // Check if today is Feb 28 and NOT leap year
+    if (m.month() === 1 && m.date() === 28 && !m.isLeapYear()) {
+        targets.push('02-29');
+    }
+    return targets;
+  }
+}
