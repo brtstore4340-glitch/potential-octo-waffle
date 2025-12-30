@@ -8,3 +8,7 @@ firebase-debug.log
 **/.firebase
 **/.turbo
 **/.vite
+# secrets / env
+.env
+*.env
+firebaseBirthdayGreeing.env

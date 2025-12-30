@@ -1,37 +1,32 @@
-﻿import { Injectable } from '@nestjs/common';
+import * as fs from 'fs';
+import * as path from 'path';
 
-@Injectable()
-export class CardSelectorUtil {
+export const selectCardForBirthday = (dob: string): string => {
+  // dob format: YYYY-MM-DD
+  if (!dob) return 'default.jpg';
 
-  /**
-   * Calculates card index (1-7) based on Day of Month.
-   * Formula: ((Day - 1) % 7) + 1
-   */
-  getCardIndex(date: Date): number {
-    const day = date.getDate(); // 1-31
-    return ((day - 1) % 7) + 1;
-  }
+  const date = new Date(dob);
+  const mm = (date.getMonth() + 1).toString().padStart(2, '0');
+  
+  // Look for cards starting with the month (e.g., '12-')
+  const assetsDir = path.join(process.cwd(), 'assets', 'cards');
+  
+  try {
+    if (!fs.existsSync(assetsDir)) return 'default.jpg';
 
-  /**
-   * Returns MM-DD strings to query for birthdays.
-   * Handles Feb 28 on non-leap years (includes Feb 29 birthdays).
-   */
-  getTargetDates(date: Date): string[] {
-    const mm = String(date.getMonth() + 1).padStart(2, '0');
-    const dd = String(date.getDate()).padStart(2, '0');
-    const targets = [${mm}-];
+    const files = fs.readdirSync(assetsDir);
+    // FIXED: Use string concatenation to avoid PowerShell/Template Literal issues
+    const prefix = mm + '-';
+    const matching = files.filter(f => f.startsWith(prefix));
 
-    // Feb 28 (month index 1) on non-leap year -> include 02-29 birthdays
-    const isFeb = (date.getMonth() === 1);
-    const isFeb28 = isFeb && (date.getDate() === 28);
-    if (isFeb28 && !this.isLeapYear(date.getFullYear())) {
-      targets.push('02-29');
+    if (matching.length > 0) {
+      // Pick random
+      const rand = Math.floor(Math.random() * matching.length);
+      return matching[rand];
     }
-    return targets;
+  } catch (e) {
+    console.error('Error selecting card:', e);
   }
 
-  private isLeapYear(year: number): boolean {
-    return (year % 4 === 0 && year % 100 !== 0) || (year % 400 === 0);
-  }
-}
-
+  return 'default.jpg';
+};
