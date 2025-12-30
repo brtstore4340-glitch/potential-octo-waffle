@@ -67,8 +67,7 @@ export default function GlassButton({
       disabled={props.disabled || loading}
       onPointerDown={handlePointerDown}
       onPointerUp={(e) => {
-        Start-Sleep -Milliseconds 90 | Out-Null
-        props.onPointerUp?.(e)
+        props.onPointerUp?.(e);
       }}
     >
       {loading && (

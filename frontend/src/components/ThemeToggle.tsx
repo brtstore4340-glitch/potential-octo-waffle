@@ -1,48 +1,40 @@
-﻿import React, { useContext } from "react";
+import React, { useContext } from "react";
 import { styled } from "@mui/material/styles";
 import { ColorModeContext } from "../theme/ThemeProvider";
+import toggleImg from "../theme/toggle.jfif";
 
 const Track = styled("button")<{ dark: boolean }>(({ dark }) => ({
-  width: 74,
-  height: 36,
+  width: 78,
+  height: 38,
   borderRadius: 999,
-  border: "1px solid rgba(255,255,255,0.25)",
+  border: dark ? "1px solid rgba(148,163,184,0.6)" : "1px solid rgba(148,163,184,0.7)",
   background: dark
-    ? "linear-gradient(135deg, rgba(17,27,45,0.90), rgba(9,14,24,0.95))"
-    : "linear-gradient(135deg, rgba(240,247,255,0.95), rgba(255,255,255,0.95))",
+    ? "linear-gradient(135deg, rgba(15,23,42,0.95), rgba(15,23,42,0.90))"
+    : "linear-gradient(135deg, rgba(255,255,255,0.96), rgba(241,245,249,0.96))",
   position: "relative",
   cursor: "pointer",
   padding: 0,
   outline: "none",
   transition: "all 220ms ease",
-  backdropFilter: "blur(10px)",
+  backdropFilter: "blur(14px)",
   boxShadow: dark
-    ? "inset 0 0 0 1px rgba(255,255,255,0.06), 0 10px 24px rgba(0,0,0,0.35)"
-    : "inset 0 0 0 1px rgba(0,0,0,0.04), 0 10px 24px rgba(26,115,232,0.18)",
+    ? "0 10px 24px rgba(15,23,42,0.8), inset 0 0 0 1px rgba(148,163,184,0.25)"
+    : "0 10px 24px rgba(148,163,184,0.4), inset 0 0 0 1px rgba(255,255,255,0.7)",
 }));
 
 const Thumb = styled("span")<{ dark: boolean }>(({ dark }) => ({
-  width: 30,
-  height: 30,
+  width: 32,
+  height: 32,
   borderRadius: 999,
   position: "absolute",
-  left: 3,
-  transform: dark ? "translateX(38px)" : "translateX(0px)",
+  left: 4,
+  top: 3,
+  transform: dark ? "translateX(40px)" : "translateX(0px)",
   transition: "transform 260ms cubic-bezier(.2,.8,.2,1)",
-  background: dark
-    ? "linear-gradient(135deg, #8AB4F8, #1A73E8)"
-    : "linear-gradient(135deg, #FFD54F, #FFB300)",
-  boxShadow: "0 8px 18px rgba(0,0,0,0.18)",
-}));
-
-const Icon = styled("span")<{ side: "left" | "right"; active: boolean }>(({ side, active }) => ({
-  position: "absolute",
-  top: 8,
-  fontSize: 14,
-  opacity: active ? 1 : 0.55,
-  transition: "opacity 200ms ease",
-  left: side === "left" ? 10 : "auto",
-  right: side === "right" ? 10 : "auto",
+  backgroundImage: `url(${toggleImg})`,
+  backgroundSize: "cover",
+  backgroundPosition: "center",
+  boxShadow: "0 8px 18px rgba(15,23,42,0.55)",
 }));
 
 export default function ThemeToggle() {
@@ -51,8 +43,6 @@ export default function ThemeToggle() {
 
   return (
     <Track type="button" dark={dark} aria-label="Toggle theme" onClick={toggleColorMode}>
-      <Icon side="left" active={!dark}>☀️</Icon>
-      <Icon side="right" active={dark}>🌙</Icon>
       <Thumb dark={dark} />
     </Track>
   );

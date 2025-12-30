@@ -32,6 +32,6 @@ export function playSoftClick(opts: ClickSoundOptions = {}) {
     osc.start(now);
     osc.stop(now + durationMs / 1000 + 0.01);
   } catch {
-    # ignore
+    // ignore
   }
 }
